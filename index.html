@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Какой департамент ИнноСити?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0B1A33;
+            --accent: #00C48C;
+            --accent-alt: #FFB800;
+            --accent-purple: #A855F7;
+            --accent-teal: #2DD4BF;
+            --white: #ffffff;
+            --dark: #060d1a;
+            --engineer: #00C48C;
+            --digital: #A855F7;
+            --eco: #FFB800;
+            --media: #2DD4BF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(0, 196, 140, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(255, 184, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        h1, h2, h3 { font-family: 'Montserrat', sans-serif; font-weight: 700; }
+
+        .quiz-container { max-width: 700px; width: 100%; }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .player-stats { display: flex; gap: 20px; align-items: center; }
+
+        .stat-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .stat-icon { font-size: 18px; }
+        .stat-num {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .stat-num.xp { color: var(--accent-alt); }
+        .stat-num.level { color: var(--accent-purple); }
+
+        .xp-bar-container {
+            width: 100px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .xp-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-alt), var(--accent));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .screen {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 35px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+        }
+
+        .screen:hover {
+            border-color: rgba(0, 196, 140, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 196, 140, 0.1);
+        }
+
+        .hidden { display: none !important; }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .logo-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-alt));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .logo span {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent-alt));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-icon { font-size: 80px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
+
+        .screen h1 { font-size: 2rem; margin-bottom: 12px; }
+        .screen h1 span { background: linear-gradient(135deg, var(--accent), var(--accent-alt)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .screen p { color: rgba(255,255,255,0.7); font-size: 1rem; margin-bottom: 25px; }
+
+        .age-input {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .age-btn {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: var(--white);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .age-btn:hover { transform: translateY(-2px); }
+        .age-btn.selected {
+            background: rgba(0, 196, 140, 0.2);
+            border-color: var(--accent);
+        }
+
+        .btn {
+            padding: 16px 35px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #00A67D);
+            color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 196, 140, 0.3);
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(0, 196, 140, 0.4); }
+
+        .progress-bar {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.current { background: var(--accent); box-shadow: 0 0 10px var(--accent); transform: scale(1.3); }
+        .progress-dot.dept-engineer { background: var(--engineer); }
+        .progress-dot.dept-digital { background: var(--digital); }
+        .progress-dot.dept-eco { background: var(--eco); }
+        .progress-dot.dept-media { background: var(--media); }
+
+        .question-number {
+            font-size: 0.8rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .question {
+            font-size: 1.35rem;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .answers { display: flex; flex-direction: column; gap: 12px; }
+
+        .answer-btn {
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.03);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            color: var(--white);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .answer-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 196, 140, 0.1), transparent);
+            transition: left 0.4s ease;
+        }
+
+        .answer-btn:hover::before { left: 100%; }
+        .answer-btn:hover { background: rgba(0, 196, 140, 0.1); border-color: rgba(0, 196, 140, 0.4); transform: translateX(5px); }
+
+        .answer-btn.selected {
+            background: rgba(0, 196, 140, 0.25);
+            border-color: var(--accent);
+        }
+
+        .answer-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .result-hero {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: resultFloat 2s ease-in-out infinite;
+        }
+        @keyframes resultFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-10px) rotate(-5deg); } 75% { transform: translateY(-5deg) rotate(5deg); } }
+
+        .dept-result {
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .dept-result.engineer { background: linear-gradient(135deg, rgba(0, 196, 140, 0.2), rgba(0, 196, 140, 0.05)); border: 2px solid var(--engineer); }
+        .dept-result.digital { background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.05)); border: 2px solid var(--digital); }
+        .dept-result.eco { background: linear-gradient(135deg, rgba(255, 184, 0, 0.2), rgba(255, 184, 0, 0.05)); border: 2px solid var(--eco); }
+        .dept-result.media { background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), rgba(45, 212, 191, 0.05)); border: 2px solid var(--media); }
+
+        .dept-result h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        .dept-result.engineer h2 { color: var(--engineer); }
+        .dept-result.digital h2 { color: var(--digital); }
+        .dept-result.eco h2 { color: var(--eco); }
+        .dept-result.media h2 { color: var(--media); }
+
+        .dept-result p { color: rgba(255,255,255,0.8); margin-bottom: 15px; }
+
+        .dept-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .dept-tag {
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .scores-section {
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .scores-section h3 {
+            font-size: 1rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .score-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+
+        .score-label {
+            width: 120px;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        .score-track {
+            flex: 1;
+            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 1s ease;
+        }
+
+        .score-fill.engineer { background: var(--engineer); }
+        .score-fill.digital { background: var(--digital); }
+        .score-fill.eco { background: var(--eco); }
+        .score-fill.media { background: var(--media); }
+
+        .score-value {
+            width: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .other-depts {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+        }
+
+        .other-depts h4 {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 12px;
+        }
+
+        .other-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .other-icon { font-size: 20px; }
+        .other-percent { color: var(--accent-alt); font-weight: 600; margin-left: auto; }
+
+        .result-message {
+            color: rgba(255,255,255,0.7);
+            font-size: 1rem;
+            margin: 20px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover { background: rgba(255,255,255,0.2); }
+
+        @media (max-width: 600px) {
+            .screen { padding: 25px 18px; }
+            .game-header { flex-direction: column; gap: 12px; }
+            .player-stats { flex-wrap: wrap; justify-content: center; }
+            .question { font-size: 1.1rem; }
+            .age-input { flex-wrap: wrap; }
+            .score-label { width: 80px; font-size: 0.75rem; }
+            .nav-buttons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <!-- Start Screen -->
+        <div class="screen" id="start-screen">
+            <div class="logo">
+                <div class="logo-icon">🏙️</div>
+                <span>ИнноСити</span>
+            </div>
+            <div class="hero-icon">🔮</div>
+            <h1>Тест: <span>Департамент</span></h1>
+            <p>Ответь на вопросы и узнай, какой департамент подходит именно тебе!</p>
+            
+            <div style="text-align: left; margin-bottom: 20px;">
+                <p style="font-size: 0.9rem; margin-bottom: 10px; color: var(--accent);">Сколько тебе лет?</p>
+                <div class="age-input" id="age-buttons">
+                    <button class="age-btn" data-age="7">7 лет</button>
+                    <button class="age-btn" data-age="8">8 лет</button>
+                    <button class="age-btn selected" data-age="9">9 лет</button>
+                    <button class="age-btn" data-age="10">10 лет</button>
+                    <button class="age-btn" data-age="11">11 лет</button>
+                    <button class="age-btn" data-age="12">12 лет</button>
+                    <button class="age-btn" data-age="13">13 лет</button>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="startQuiz()">Начать тест</button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div class="screen hidden" id="quiz-screen">
+            <div class="game-header">
+                <div class="player-stats">
+                    <div class="stat-box">
+                        <span class="stat-icon">⭐</span>
+                        <span class="stat-num level" id="level">1</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-icon">💎</span>
+                        <span class="stat-num xp" id="xp">0</span>
+                        <div class="xp-bar-container"><div class="xp-bar" id="xp-bar"></div></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="progress-bar" id="progress-bar"></div>
+            
+            <div class="question-number" id="question-number">Вопрос 1</div>
+            <div class="question" id="question">Вопрос будет здесь</div>
+            <div class="answers" id="answers"></div>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="screen hidden" id="result-screen">
+            <div class="result-hero" id="result-hero">🏆</div>
+            <h2 id="result-title">Твой департамент</h2>
+            
+            <div class="dept-result" id="dept-result">
+                <h2 id="dept-name">Инженерный штаб</h2>
+                <p id="dept-desc">Описание департамента...</p>
+                <div class="dept-tags" id="dept-tags"></div>
+            </div>
+            
+            <div class="scores-section">
+                <h3>📊 Твои результаты:</h3>
+                <div id="score-bars"></div>
+            </div>
+            
+            <div class="other-depts" id="other-depts"></div>
+            
+            <p class="result-message" id="result-message">Отличный результат!</p>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="restartQuiz()">Пройти заново</button>
+                <button class="btn btn-primary" onclick="window.open('index.html', '_blank')">На сайт лагеря</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const QUESTIONS = [
+            {
+                question: "Что тебе интереснее всего делать?",
+                answers: [
+                    { text: "Собирать и конструировать механизмы", icon: "🔧", dept: "engineer" },
+                    { text: "Программировать и создавать сайты", icon: "💻", dept: "digital" },
+                    { text: "Изучать природу и помогать экологии", icon: "🌱", dept: "eco" },
+                    { text: "Снимать видео и создавать контент", icon: "📹", dept: "media" }
+                ]
+            },
+            {
+                question: "Какой предмет в школе тебе нравится больше всего?",
+                answers: [
+                    { text: "Математика и физика", icon: "📐", dept: "engineer" },
+                    { text: "Информатика и технологии", icon: "💻", dept: "digital" },
+                    { text: "Биология и география", icon: "🌿", dept: "eco" },
+                    { text: "Русский язык и искусство", icon: "🎨", dept: "media" }
+                ]
+            },
+            {
+                question: "Какую игру ты бы выбрал?",
+                answers: [
+                    { text: "LEGO или конструктор", icon: "🧱", dept: "engineer" },
+                    { text: "Программирование или головоломки", icon: "🎮", dept: "digital" },
+                    { text: "Выживание в природе", icon: "🏕️", dept: "eco" },
+                    { text: "Создание персонажей и историй", icon: "🎭", dept: "media" }
+                ]
+            },
+            {
+                question: "Что ты делаешь в свободное время?",
+                answers: [
+                    { text: "Что-то мастерю своими руками", icon: "🔨", dept: "engineer" },
+                    { text: "Играю в компьютерные игры", icon: "🖥️", dept: "digital" },
+                    { text: "Гуляю на природе", icon: "🌳", dept: "eco" },
+                    { text: "Рисую или снимаю видео", icon: "📸", dept: "media" }
+                ]
+            },
+            {
+                question: "Какой тип проекта тебе интереснее?",
+                answers: [
+                    { text: "Создать работающий прототип", icon: "⚙️", dept: "engineer" },
+                    { text: "Разработать приложение или сайт", icon: "🌐", dept: "digital" },
+                    { text: "Исследовать экологическую проблему", icon: "🔬", dept: "eco" },
+                    { text: "Снять видео или создать презентацию", icon: "🎬", dept: "media" }
+                ]
+            },
+            {
+                question: "Как ты любишь работать в команде?",
+                answers: [
+                    { text: "Делаю основную работу руками", icon: "✋", dept: "engineer" },
+                    { text: "Решаю технические задачи", icon: "🧠", dept: "digital" },
+                    { text: "Анализирую информацию", icon: "📊", dept: "eco" },
+                    { text: "Представляю результаты", icon: "🎤", dept: "media" }
+                ]
+            },
+            {
+                question: "Какой инструмент ты бы хотел освоить?",
+                answers: [
+                    { text: "3D-принтер или лазерный резак", icon: "🖨️", dept: "engineer" },
+                    { text: "Языки программирования", icon: "⌨️", dept: "digital" },
+                    { text: "Лабораторное оборудование", icon: "🧪", dept: "eco" },
+                    { text: "Видеокамеру или графический планшет", icon: "📷", dept: "media" }
+                ]
+            },
+            {
+                question: "Что для тебя важнее в проекте?",
+                answers: [
+                    { text: "Чтобы оно работало!", icon: "✅", dept: "engineer" },
+                    { text: "Чтобы было умно и технологично", icon: "💡", dept: "digital" },
+                    { text: "Чтобы помогало планете", icon: "🌍", dept: "eco" },
+                    { text: "Чтобы было красиво и понятно", icon: "✨", dept: "media" }
+                ]
+            },
+            {
+                question: "Кем ты видишь себя в будущем?",
+                answers: [
+                    { text: "Инженером или изобретателем", icon: "👨‍🔧", dept: "engineer" },
+                    { text: "Программистом или айтишником", icon: "👨‍💻", dept: "digital" },
+                    { text: "Учёным-экологом", icon: "👨‍🔬", dept: "eco" },
+                    { text: "Блогером или дизайнером", icon: "🎬", dept: "media" }
+                ]
+            },
+            {
+                question: "Какое качество для тебя главное?",
+                answers: [
+                    { text: "Терпение и точность", icon: "🎯", dept: "engineer" },
+                    { text: "Логика и анализ", icon: "🔢", dept: "digital" },
+                    { text: "Внимательность и забота", icon: "💚", dept: "eco" },
+                    { text: "Креативность и общение", icon: "💬", dept: "media" }
+                ]
+            }
+        ];
+
+        const DEPARTMENTS = {
+            engineer: {
+                name: "Инженерный штаб",
+                icon: "⚙️",
+                desc: "Здесь ты будешь создавать прототипы, чертежи и работать с 3D-моделями. Идеально для тех, кто любит мастерить и конструировать!",
+                tags: ["3D-моделирование", "Прототипирование", "Конструирование", "Arduino"],
+                color: "#00C48C"
+            },
+            digital: {
+                name: "Цифровой штаб",
+                icon: "💻",
+                desc: "Здесь ты будешь программировать, работать с данными и создавать цифровые продукты. Идеально для будущих айтишников!",
+                tags: ["Программирование", "Веб-разработка", "Аналитика", "ИИ"],
+                color: "#A855F7"
+            },
+            eco: {
+                name: "Эко-лаборатория",
+                icon: "🌱",
+                desc: "Здесь ты будешь изучать экологию, проводить исследования и создавать проекты по устойчивому развитию. Идеально для любителей природы!",
+                tags: ["Экология", "Исследования", "ESG", "Устойчивость"],
+                color: "#FFB800"
+            },
+            media: {
+                name: "Медиацентр",
+                icon: "📰",
+                desc: "Здесь ты будешь создавать контент, снимать видео и рассказывать истории. Идеально для творческих коммуникаторов!",
+                tags: ["Видеосъёмка", "Журналистика", "Дизайн", "PR"],
+                color: "#2DD4BF"
+            }
+        };
+
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let scores = { engineer: 0, digital: 0, eco: 0, media: 0 };
+        let selectedAge = 9;
+        let stats = { tests: 0, bestDept: null };
+
+        function loadStats() {
+            const saved = localStorage.getItem('innositiDeptTestStats');
+            if (saved) {
+                stats = JSON.parse(saved);
+            }
+        }
+
+        function saveStats() {
+            localStorage.setItem('innositiDeptTestStats', JSON.stringify(stats));
+        }
+
+        loadStats();
+
+        document.querySelectorAll('.age-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.age-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedAge = parseInt(btn.dataset.age);
+            });
+        });
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function startQuiz() {
+            currentQuestions = shuffleArray(QUESTIONS);
+            currentIndex = 0;
+            scores = { engineer: 0, digital: 0, eco: 0, media: 0 };
+            
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            
+            renderProgress();
+            showQuestion();
+        }
+
+        function renderProgress() {
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.innerHTML = '';
+            for (let i = 0; i < currentQuestions.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                if (i < currentIndex) {
+                    dot.classList.add('current');
+                } else if (i === currentIndex) {
+                    dot.classList.add('current');
+                }
+                progressBar.appendChild(dot);
+            }
+        }
+
+        function showQuestion() {
+            const q = currentQuestions[currentIndex];
+            document.getElementById('question-number').textContent = `Вопрос ${currentIndex + 1}/${currentQuestions.length}`;
+            document.getElementById('question').textContent = q.question;
+            
+            const answersDiv = document.getElementById('answers');
+            answersDiv.innerHTML = '';
+            
+            q.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.innerHTML = `<span class="answer-icon">${answer.icon}</span>${answer.text}`;
+                btn.addEventListener('click', () => selectAnswer(answer.dept));
+                answersDiv.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(dept) {
+            scores[dept] += 1;
+            
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(btn => {
+                btn.style.pointerEvents = 'none';
+                btn.classList.add('selected');
+            });
+            
+            currentIndex++;
+            
+            if (currentIndex < currentQuestions.length) {
+                setTimeout(() => {
+                    renderProgress();
+                    showQuestion();
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    showResults();
+                }, 500);
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            
+            const sortedDepts = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+            const topDept = sortedDepts[0][0];
+            const dept = DEPARTMENTS[topDept];
+            
+            document.getElementById('result-hero').textContent = dept.icon;
+            document.getElementById('dept-name').textContent = dept.name;
+            document.getElementById('dept-desc').textContent = dept.desc;
+            
+            const tagsContainer = document.getElementById('dept-tags');
+            tagsContainer.innerHTML = dept.tags.map(tag => `<span class="dept-tag">${tag}</span>`).join('');
+            
+            const resultDiv = document.getElementById('dept-result');
+            resultDiv.className = `dept-result ${topDept}`;
+            
+            const scoreBars = document.getElementById('score-bars');
+            const total = currentQuestions.length;
+            scoreBars.innerHTML = sortedDepts.map(([dept, score]) => `
+                <div class="score-bar">
+                    <span class="score-label">${DEPARTMENTS[dept].icon} ${DEPARTMENTS[dept].name}</span>
+                    <div class="score-track">
+                        <div class="score-fill ${dept}" style="width: ${(score / total) * 100}%"></div>
+                    </div>
+                    <span class="score-value">${Math.round((score / total) * 100)}%</span>
+                </div>
+            `).join('');
+            
+            const otherDepts = document.getElementById('other-depts');
+            otherDepts.innerHTML = `
+                <h4>Также подходит:</h4>
+                ${sortedDepts.slice(1, 3).map(([dept, score]) => `
+                    <div class="other-item">
+                        <span class="other-icon">${DEPARTMENTS[dept].icon}</span>
+                        <span>${DEPARTMENTS[dept].name}</span>
+                        <span class="other-percent">${Math.round((score / total) * 100)}%</span>
+                    </div>
+                `).join('')}
+            `;
+            
+            const messages = [
+                `Отличный выбор! В департаменте "${dept.name}" ты раскроешь свой потенциал!`,
+                `Ты отлично справился! "${dept.name}" — идеальный выбор для тебя!`,
+                `Поздравляем! Твой выбор — "${dept.name}"!`
+            ];
+            document.getElementById('result-message').textContent = messages[Math.floor(Math.random() * messages.length)];
+            
+            stats.tests++;
+            stats.bestDept = topDept;
+            saveStats();
+        }
+
+        function restartQuiz() {
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
